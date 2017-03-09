@@ -127,7 +127,7 @@ function layout(standup) {
       if (_.isEmpty(actions)) return;
       result.push(`> *${_.startCase(phase)}*`);
       actions.forEach((action) => {
-        result.push(`> - ${_.capitalize(action)}`);
+        result.push(`> - ${action}`);
       });
     });
   });
