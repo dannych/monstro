@@ -6,6 +6,7 @@ import { getTodayChannelHistory, getUserList } from './lib/slack';
 import summarizeStandup from './lib/standup';
 
 const controller = Botkit.slackbot({});
+controller.setupWebserver(config.PORT);
 
 controller
   .spawn({ token: config.SLACK_BOT_TOKEN })
