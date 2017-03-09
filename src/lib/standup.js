@@ -45,8 +45,13 @@ function updateStandupResult(result, message) {
   let mode; let phase;
   text.split('\n').forEach((line) => {
     phase = isStandupPhase(line);
-    if (mode && isStandupAction(line)) appropriateInfo[mode].push(_.trim(line, ' -'));
-    else if (phase) mode = phase;
+    if (mode && isStandupAction(line)) {
+      appropriateInfo[mode].push(
+        _.chain(line).trim(' -*_').value());
+      appropriateInfo[mode] = _.uniq(appropriateInfo[mode]);
+    } else if (phase) {
+      mode = phase;
+    }
   });
 
   return result;
@@ -122,7 +127,7 @@ function layout(standup) {
       if (_.isEmpty(actions)) return;
       result.push(`> *${_.startCase(phase)}*`);
       actions.forEach((action) => {
-        result.push(`> - ${action}`);
+        result.push(`> - ${_.capitalize(action)}`);
       });
     });
   });
