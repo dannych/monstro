@@ -17,6 +17,8 @@ controller.hears(['hi'], ['direct_message', 'direct_mention', 'mention'], (bot, 
 });
 
 controller.hears(['summarize'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
+  bot.startTyping(message);
+
   const todayHistory = getTodayChannelHistory(bot.api, config.SLACK_CHANNEL_ID);
   const membersInfo = getUserList(bot.api);
 
