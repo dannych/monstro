@@ -1,7 +1,10 @@
 import _ from 'lodash';
 import moment from 'moment';
 
+import config from '../config';
 import { parse as parseStandup, DONE } from './standup';
+
+const timezone = config.TIMEZONE;
 
 function layoutMultiple(reports) {
   const result = [];
@@ -50,7 +53,7 @@ function layoutSingle() {
 function parse(reports) {
   return reports.map(({ member, ...status }) => {
     const activity = _.groupBy(status[DONE], action =>
-    _.toLower(moment.unix(action.timestamp).tz('Asia/Jakarta').format('dddd')));
+    _.toLower(moment.unix(action.timestamp).tz(timezone).format('dddd')));
     return {
       member,
       activity,

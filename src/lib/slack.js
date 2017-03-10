@@ -2,7 +2,9 @@ import { last } from 'lodash';
 import bluebird from 'bluebird';
 import moment from 'moment-timezone';
 
-const timezone = 'Asia/Jakarta';
+import config from '../config';
+
+const timezone = config.TIMEZONE;
 
 function getChannelHistoryExhaustively(repo, channel, latest, oldest, currentData) {
   return repo({ channel, latest, oldest, count: 1000 }).then((ret) => {
