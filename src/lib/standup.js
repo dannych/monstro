@@ -1,9 +1,9 @@
 import _ from 'lodash';
 
-const ISSUE = 'issue';
-const DONE = 'done';
-const NEXT = 'next';
-const WIP = 'wip';
+export const ISSUE = 'issue';
+export const DONE = 'done';
+export const NEXT = 'next';
+export const WIP = 'wip';
 
 function createEmptyResult(members) {
   return members.map(member => ({
@@ -38,6 +38,15 @@ function isStandupMessage(message) {
   return isStandupPhase(firstLine);
 }
 
+function transformStandupAction(action, timestamp) {
+  const text = _.chain(action).trim(' -*_').value();
+  return {
+    slug: _.snakeCase(text),
+    timestamp,
+    text,
+  };
+}
+
 function updateStandupResult(result, message) {
   const appropriateInfo = result.find(info => info.member.id === message.user);
   const text = sanitizeText(message.text);
@@ -46,9 +55,9 @@ function updateStandupResult(result, message) {
   text.split('\n').forEach((line) => {
     phase = isStandupPhase(line);
     if (mode && isStandupAction(line)) {
-      appropriateInfo[mode].push(
-        _.chain(line).trim(' -*_').value());
-      appropriateInfo[mode] = _.uniq(appropriateInfo[mode]);
+      const action = transformStandupAction(line, message.ts);
+      appropriateInfo[mode].push(action);
+      appropriateInfo[mode] = _.uniqBy(appropriateInfo[mode], x => x.slug);
     } else if (phase) {
       mode = phase;
     }
@@ -63,7 +72,7 @@ function updateStandupResult(result, message) {
  *  {
  *    "type": "message",
  *    "user": "U0DNBTXPX",
- *    "text": "<@U4F6Q1G1Y> summarize 1d",
+ *    "text": "summarize 1d",
  *    "ts": "1489030083.000042"
  *  }
  * ]
@@ -81,14 +90,14 @@ function updateStandupResult(result, message) {
  * [
  *  {
  *    "member": {},
- *    "issue": ["",""],
- *    "done": ["",""],
- *    "wip": ["",""],
- *    "next": ["",""],
+ *    "issue": [{},{}],
+ *    "done": [{},{}],
+ *    "wip": [{},{}],
+ *    "next": [{},{}],
  *  }
  * ]
  */
-function parse(history, members) {
+export function parse(history, members) {
   const emptyResult = createEmptyResult(members);
   return history.reduce((result, message) => {
     if (isStandupMessage(message)) return updateStandupResult(result, message);
@@ -127,7 +136,7 @@ function layout(standup) {
       if (_.isEmpty(actions)) return;
       result.push(`> *${_.startCase(phase)}*`);
       actions.forEach((action) => {
-        result.push(`> - ${action}`);
+        result.push(`> - ${action.text}`);
       });
     });
   });
@@ -139,7 +148,7 @@ function layout(standup) {
   return result.join('\n');
 }
 
-export default function summarizeStandup(history, members) {
+export function summarizeStandup(history = [], members = []) {
   const parsedCoversation = parse(history, members);
   return layout(parsedCoversation);
 }

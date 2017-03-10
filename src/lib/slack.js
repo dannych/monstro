@@ -15,6 +15,14 @@ function getChannelHistoryExhaustively(repo, channel, latest, oldest, currentDat
   });
 }
 
+export function getThisWeekChannelHistory(api, channelId) {
+  const channelHistoryF = bluebird.promisify(api.groups.history);
+  const latest = moment.tz(timezone);
+  const oldest = moment.tz(timezone).startOf('week');
+  return getChannelHistoryExhaustively(channelHistoryF,
+    channelId, latest.unix(), oldest.unix(), []);
+}
+
 export function getTodayChannelHistory(api, channelId) {
   const channelHistoryF = bluebird.promisify(api.groups.history);
   const latest = moment.tz(timezone);

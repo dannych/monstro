@@ -2,8 +2,9 @@ import Botkit from 'botkit';
 import bluebird from 'bluebird';
 
 import config from './config';
-import { getTodayChannelHistory, getUserList } from './lib/slack';
-import summarizeStandup from './lib/standup';
+import { getThisWeekChannelHistory, getTodayChannelHistory, getUserList } from './lib/slack';
+import { summarizeStandup } from './lib/standup';
+import { digestAllReport } from './lib/report';
 
 const controller = Botkit.slackbot({});
 controller.setupWebserver(config.PORT);
@@ -24,5 +25,16 @@ controller.hears(['summarize'], ['direct_message', 'direct_mention', 'mention'],
 
   bluebird.join(todayHistory, membersInfo, (history, members) => {
     bot.reply(message, summarizeStandup(history, members));
+  });
+});
+
+controller.hears(['digest'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
+  bot.startTyping(message);
+
+  const todayHistory = getThisWeekChannelHistory(bot.api, config.SLACK_CHANNEL_ID);
+  const membersInfo = getUserList(bot.api);
+
+  bluebird.join(todayHistory, membersInfo, (history, members) => {
+    bot.reply(message, digestAllReport(history, members));
   });
 });
