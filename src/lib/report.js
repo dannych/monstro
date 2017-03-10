@@ -5,6 +5,7 @@ import config from '../config';
 import { parse as parseStandup, DONE } from './standup';
 
 const timezone = config.TIMEZONE;
+const WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
 
 function layoutMultiple(reports) {
   const result = [];
@@ -13,8 +14,10 @@ function layoutMultiple(reports) {
     if (_.isEmpty(activity)) return;
 
     result.push(`*${member.name}*`);
-    _.forEach(activity, (actions, day) => {
-      result.push(`> *${_.startCase(day)}*`);
+    _.forEach(WEEKDAYS.slice(1), (day, i) => {
+      const actions = activity[day];
+      if (!actions) return;
+      result.push(`> *${_.startCase(WEEKDAYS[i])}*`);
       actions.forEach((action) => {
         result.push(`> - ${action.text}`);
       });
@@ -31,8 +34,10 @@ function layoutMultiple(reports) {
 function layoutSingle({ activity }) {
   const result = [];
 
-  _.forEach(activity, (actions, day) => {
-    result.push(`> *${_.startCase(day)}*`);
+  _.forEach(WEEKDAYS.slice(1), (day, i) => {
+    const actions = activity[day];
+    if (!actions) return;
+    result.push(`> *${_.startCase(WEEKDAYS[i])}*`);
     actions.forEach((action) => {
       result.push(`> - ${action.text}`);
     });
@@ -51,8 +56,8 @@ function layoutSingle({ activity }) {
  *  {
  *    member: {},
  *    activity: {
- *      sunday: [{},{}]
- *      monday: [{},{}]
+ *      monday: [{},{}],
+ *      ...
  *    }
  *  }
  * ]
