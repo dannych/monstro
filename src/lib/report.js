@@ -28,8 +28,15 @@ function layoutMultiple(reports) {
   return result.join('\n');
 }
 
-function layoutSingle() {
+function layoutSingle({ activity }) {
   const result = [];
+
+  _.forEach(activity, (actions, day) => {
+    result.push(`> *${_.startCase(day)}*`);
+    actions.forEach((action) => {
+      result.push(`> - ${action.text}`);
+    });
+  });
 
   if (!_.isEmpty(result)) {
     result.unshift('Here is your report for this week:');
@@ -67,6 +74,7 @@ export function digestAllReport(history = [], members = []) {
 }
 
 export function digestIndividualReport(member, history = [], members = []) {
-  const report = parseStandup(history, members);
-  return layoutSingle(report);
+  const reports = parseStandup(history, members);
+  const parsedReports = parse(reports);
+  return layoutSingle(parsedReports.find(report => report.member.id === member.id));
 }
