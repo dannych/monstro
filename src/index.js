@@ -17,7 +17,7 @@ controller.hears(['hi'], ['direct_message', 'direct_mention', 'mention'], (bot, 
   bot.reply(message, 'hi');
 });
 
-controller.hears(['summarize (.*)'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
+controller.hears(['summarize (.*)', 'summarize'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
   bot.startTyping(message);
 
   const layoutMode = message.match[1];

@@ -174,26 +174,26 @@ function defaultLayout(standup) {
  */
 function htmlLayout(standup) {
   const result = [];
-  standup.forEach(({member, ...status}) => {
+  standup.forEach(({ member, ...status }) => {
     if (member.is_bot) return;
     if (_.every(status, _.isEmpty)) return;
     const phases = [ISSUE, DONE, WIP, NEXT];
 
     result.push(`<b>${member.name}</b>`);
-    result.push('<ul>')
+    result.push('<ul>');
     phases.forEach((phase) => {
       const actions = status[phase];
       if (_.isEmpty(actions)) return;
-      result.push('<li>')
-      result.push(${_.startCase(phase)});
-      result.push('<ul>')
+      result.push('<li>');
+      result.push(_.startCase(phase));
+      result.push('<ul>');
       actions.forEach((action) => {
         result.push(`<li>${action.text}</li>`);
       });
-      result.push('</ul>')
-      result.push('</li>')
+      result.push('</ul>');
+      result.push('</li>');
     });
-    result.push('</ul>')
+    result.push('</ul>');
   });
 
   if (!_.isEmpty(result)) {
