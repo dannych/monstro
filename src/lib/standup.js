@@ -128,7 +128,7 @@ function layout(standup) {
   standup.forEach(({ member, ...status }) => {
     if (member.is_bot) return;
     if (_.every(status, _.isEmpty)) return;
-    const phases = [ISSUE, WIP, NEXT, DONE];
+    const phases = [ISSUE, DONE, WIP, NEXT];
 
     result.push(`*${member.name}*`);
     phases.forEach((phase) => {
