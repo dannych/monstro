@@ -123,7 +123,7 @@ export function parse(history, members) {
  * > *Done*
  * > - wohoo
  */
-function layout(standup) {
+function defaultLayout(standup) {
   const result = [];
   standup.forEach(({ member, ...status }) => {
     if (member.is_bot) return;
@@ -148,7 +148,63 @@ function layout(standup) {
   return result.join('\n');
 }
 
-export function summarizeStandup(history = [], members = []) {
+/**
+ * standup:
+ * [
+ *  {
+ *    "member": { name: xxxxx },
+ *    "issue": ["",""],
+ *    "done": ["wohoo",""],
+ *    "wip": ["",""],
+ *    "next": ["",""],
+ *  }
+ * ]
+ *
+ * output:
+ *
+ * <b>xxxxx</b>
+ * <ul>
+ *   <li>
+ *     Done
+ *     <ul>
+ *       <li>wohoo</li>
+ *     </ul>
+ *   </li>
+ * </ul>
+ */
+function htmlLayout(standup) {
+  const result = [];
+  standup.forEach(({member, ...status}) => {
+    if (member.is_bot) return;
+    if (_.every(status, _.isEmpty)) return;
+    const phases = [ISSUE, DONE, WIP, NEXT];
+
+    result.push(`<b>${member.name}</b>`);
+    result.push('<ul>')
+    phases.forEach((phase) => {
+      const actions = status[phase];
+      if (_.isEmpty(actions)) return;
+      result.push('<li>')
+      result.push(${_.startCase(phase)});
+      result.push('<ul>')
+      actions.forEach((action) => {
+        result.push(`<li>${action.text}</li>`);
+      });
+      result.push('</ul>')
+      result.push('</li>')
+    });
+    result.push('</ul>')
+  });
+
+  if (!_.isEmpty(result)) {
+    result.unshift('Here is the standup summary for today:');
+  }
+
+  return result.join('\n');
+}
+
+export function summarizeStandup(history = [], members = [], layoutMode) {
   const parsedCoversation = parse(history, members);
+  const layout = (layoutMode === 'html') ? htmlLayout : defaultLayout;
   return layout(parsedCoversation);
 }
