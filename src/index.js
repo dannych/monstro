@@ -17,14 +17,15 @@ controller.hears(['hi'], ['direct_message', 'direct_mention', 'mention'], (bot, 
   bot.reply(message, 'hi');
 });
 
-controller.hears(['summarize'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
+controller.hears(['summarize (.*)', 'summarize'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
   bot.startTyping(message);
 
+  const layoutMode = message.match[1];
   const todayHistory = getTodayChannelHistory(bot.api, config.SLACK_CHANNEL_ID);
   const membersInfo = getUserList(bot.api);
 
   bluebird.join(todayHistory, membersInfo, (history, members) => {
-    bot.reply(message, summarizeStandup(history, members));
+    bot.reply(message, summarizeStandup(history, members, layoutMode));
   });
 });
 
